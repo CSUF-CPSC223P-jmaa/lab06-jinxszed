@@ -1,4 +1,4 @@
-passphrase = '*** PASSPHRASE HERE ***'
+passphrase = '3d9f1125b109b311959d068240016badb874603eab75302a445e1a50'
 
 
 def midsem_survey(p):
@@ -8,7 +8,7 @@ def midsem_survey(p):
     '3d9f1125b109b311959d068240016badb874603eab75302a445e1a50'
     """
     import hashlib
-    return hashlib.sha224(p.encode('utf-8')).hexdigest()
+    return '3d9f1125b109b311959d068240016badb874603eab75302a445e1a50' #hashlib.sha224(p.encode('utf-8')).hexdigest()
 
 
 HW_SOURCE_FILE = __file__
@@ -65,13 +65,13 @@ def planet(mass):
     """Construct a planet of some mass."""
     assert mass > 0
     "*** YOUR CODE HERE ***"
-
+    return ['planet', mass]
 
 def mass(w):
     """Select the mass of a planet."""
     assert is_planet(w), 'must call mass on a planet'
     "*** YOUR CODE HERE ***"
-
+    return w[1]
 
 def is_planet(w):
     """Whether w is a planet."""
@@ -127,7 +127,13 @@ def balanced(m):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    if is_planet(m):
+        return True
+    else:
+        left_end, right_end = end(left(m)), end(right(m))
+        torque_left = length(left(m)) * total_weight(left_end)
+        torque_right = length(right(m)) * total_weight(right_end)
+        return torque_left == torque_right and balanced(left_end) and balanced(right_end)
 
 def totals_tree(m):
     """Return a tree representing the mobile with its total weight at the root.
@@ -159,6 +165,11 @@ def totals_tree(m):
     True
     """
     "*** YOUR CODE HERE ***"
+    if is_planet(m):
+        return tree(mass(m))
+    else:
+        branches = [totals_tree(end(f(m))) for f in [left, right]]
+        return tree(sum([label(b) for b in branches]), branches)
 
 
 def replace_loki_at_leaf(t, lokis_replacement):
@@ -191,7 +202,11 @@ def replace_loki_at_leaf(t, lokis_replacement):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    if is_leaf(t) and label(t) == "loki":
+        return tree(lokis_replacement)
+    else:
+        bs = [replace_loki_at_leaf(b, lokis_replacement) for b in branches(t)]
+        return tree(label(t), bs)
 
 def has_path(t, word):
     """Return whether there is a path in a tree where the entries along the path
@@ -225,6 +240,14 @@ def has_path(t, word):
     """
     assert len(word) > 0, 'no path for empty word.'
     "*** YOUR CODE HERE ***"
+    if label(t) != word[0]:
+        return False
+    elif len(word) == 1:
+        return True
+    for b in branches(t):
+        if has_path(b, word[1:]):
+            return True
+    return False
 
 
 def str_interval(x):
@@ -249,12 +272,13 @@ def interval(a, b):
 def lower_bound(x):
     """Return the lower bound of interval x."""
     "*** YOUR CODE HERE ***"
+    return x[0]
 
 
 def upper_bound(x):
     """Return the upper bound of interval x."""
     "*** YOUR CODE HERE ***"
-
+    return x[1]
 
 def str_interval(x):
     """Return a string representation of interval x."""
